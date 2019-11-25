@@ -7,9 +7,10 @@ In my case, measurements are recorder by a Laser Egg device.
 
 The formula for `favorite_level` is:
 ```
-min(MAX_LVL, round((mean_pm25 - DESIRED_PM25) / 5))
+min(MAX_LVL, round(max(MIN_LVL, mean_pm25 - DESIRED_PM25) / 5))
 ```
 where `MAX_LVL` is 10,<br/>
+`MIN_LVL` is 0,<br/>
 `DESIRED_PM25` is 5<br/>
 and `mean_pm25` is average from last 5 measurements.
 
