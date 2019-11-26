@@ -32,9 +32,11 @@ devices:
   - name: Office
     ip: 192.168.1.100
     token: xxxxxxxxxxxxx
+    leniency: 4
   - name: Bedroom
     ip: 192.168.1.101
     token: xxxxxxxxxxxxx
+    leniency: 5
 
 ```
 

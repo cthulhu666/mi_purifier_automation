@@ -8,5 +8,5 @@ stats = datadog.ThreadStats()
 stats.start()
 
 
-def send(lvl):
-    stats.gauge('air.purifier.level', lvl)
+def send(device: str, lvl: int):
+    stats.gauge('air.purifier.level', lvl, tags=[f"device:{device.lower()}"])

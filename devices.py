@@ -8,4 +8,4 @@ def all_devices():
                                             entry['token'])
 
     with open('devices.yml', 'r') as f:
-        return [device(e) for e in yaml.safe_load(f)['devices']]
+        return [(device(e), e) for e in yaml.safe_load(f)['devices']]
