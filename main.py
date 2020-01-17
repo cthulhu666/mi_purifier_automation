@@ -1,4 +1,5 @@
 import os
+import sys
 import paho.mqtt.client as mqtt
 
 from handlers import on_message
@@ -15,7 +16,10 @@ client.connect(broker_url, broker_port)
 
 def on_disconnect(_client, _userdata, rc):
     if rc != 0:
-        print("Unexpected MQTT disconnection. Will auto-reconnect")
+        print("Unexpected disconnection. Exiting...")
+        sys.exit(1)
+    else:
+        print("Disconnected successfully")
 
 
 client.on_message = on_message
