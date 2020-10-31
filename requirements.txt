@@ -1,4 +1,4 @@
-datadog==0.31.0
-paho-mqtt==1.5.0
-python-miio==0.4.7
-PyYaml==5.1.2
+datadog==0.39.0
+paho-mqtt==1.5.1
+python-miio==0.5.3
+PyYaml==5.3.1
