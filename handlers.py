@@ -11,34 +11,48 @@ MAX_LVL = 10
 DESIRED_PM25 = 5
 DEFAULT_LENIENCY = 5
 
-_devices = devices.all_devices()
+# _devices = devices.all_devices()
 
 _measurements = collections.deque([], 5)
 
 
-for d, _ in _devices:
-    d.set_buzzer(0)
-    d.set_mode(miio.airpurifier.OperationMode.Favorite)
+# for d, _ in _devices:
+#     d.set_buzzer(0)
+#     d.set_mode(miio.airpurifier.OperationMode.Favorite)
 
 
-def on_message(_client, _userdata, message):
-    try:
-        data = json.loads(message.payload.decode())
-        ts, pm25 = data[0], data[1]['pm25']
-        _measurements.append(pm25)
-        mean_pm25 = sum(_measurements) / len(_measurements)
-        print(f"[{ts}] PM2.5: {pm25} (mean: {mean_pm25})")
-        for d, cfg in _devices:
-            leniency = cfg.get('leniency', DEFAULT_LENIENCY)
-            lvl = _calculate_level(mean_pm25, leniency)
-            if d.status().favorite_level != lvl:
-                print(f"{cfg['name']} | Adjusting level: {lvl}")
-                d.set_favorite_level(lvl)
-            else:
-                print(f"{cfg['name']} | Keeping level: {lvl}")
-            dog.send(cfg['name'], lvl)
-    except Exception as e:
-        print(e)
+def on_sensor_msg(_client, _userdata, message):
+    data = json.loads(message.payload.decode())
+    device = message.topic.split('/')[1]
+    print(device, data)
+    tags = [f"device:{device}"]
+    for k in ['humidity', 'temperature', 'battery', 'linkquality']:
+        dog.gauge(f'sensor.{k}', data.get(k), tags)
+
+
+def on_laseregg_msg(_client, _userdata, message):
+    print(message.topic)
+    # try:
+    #     data = json.loads(message.payload.decode())
+    #     ts, pm25 = data[0], data[1]['pm25']
+    #     _measurements.append(pm25)
+    #     mean_pm25 = sum(_measurements) / len(_measurements)
+    #     print(f"[{ts}] PM2.5: {pm25} (mean: {mean_pm25})")
+    #     for d, cfg in _devices:
+    #         leniency = cfg.get('leniency', DEFAULT_LENIENCY)
+    #         lvl = _calculate_level(mean_pm25, leniency)
+    #         if d.status().favorite_level != lvl:
+    #             print(f"{cfg['name']} | Adjusting level: {lvl}")
+    #             d.set_favorite_level(lvl)
+    #         else:
+    #             print(f"{cfg['name']} | Keeping level: {lvl}")
+    #         dog.send(cfg['name'], lvl)
+    # except Exception as e:
+    #     print(e)
+
+
+def on_unknown_message(_client, _userdata, message):
+    print(f"Unknown topic: {message.topic}")
 
 
 def _calculate_level(mean_pm25, leniency):
