@@ -2,7 +2,7 @@ import os
 import sys
 import paho.mqtt.client as mqtt
 
-from handlers import on_sensor_msg, on_laseregg_msg, on_unknown_message
+from handlers import on_sensor_msg, on_laseregg_msg, on_button_msg, on_unknown_message
 
 broker_url = os.environ['MQTT_BROKER_URL']  # TODO:rename to MQTT_BROKER_HOST
 broker_port = os.environ['MQTT_BROKER_PORT']
@@ -22,11 +22,19 @@ def on_disconnect(_client, _userdata, rc):
         print("Disconnected successfully")
 
 
-client.message_callback_add('laseregg', on_laseregg_msg)
+def on_publish(client, userdata, mid):
+    print(userdata, mid)
+
+
+client.message_callback_add('zigbee2mqtt/switch-1', on_button_msg)
 client.message_callback_add('zigbee2mqtt/bedroom-sensor-1', on_sensor_msg)
+client.message_callback_add('laseregg', on_laseregg_msg)
 
 client.on_message = on_unknown_message
 client.on_disconnect = on_disconnect
+client.on_publish = on_publish
 
-client.subscribe([('laseregg', 0), ('zigbee2mqtt/bedroom-sensor-1', 0)])
+client.subscribe([('laseregg', 0),
+                  ('zigbee2mqtt/bedroom-sensor-1', 0),
+                  ('zigbee2mqtt/switch-1', 0)])
 client.loop_forever()
